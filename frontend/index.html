@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Fact Detective Agency — Fact Knowledge & Adjudication Layer</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar / Brand Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🕵️‍♂️⚖️</div>
+        <div>
+          <h1 class="brand-title">Fact Detective</h1>
+          <span class="brand-subtitle">Knowledge & Adjudication Layer</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="showcase-tab">
+          <span class="nav-icon">⭐</span>
+          <span>Showcase Exhibits</span>
+          <span class="badge count-badge">5 Exhibits</span>
+        </button>
+        <button class="nav-item" data-tab="dossier-tab">
+          <span class="nav-icon">📁</span>
+          <span>Knowledge Graph</span>
+          <span class="badge count-badge" id="total-facts-badge">0</span>
+        </button>
+        <button class="nav-item" data-tab="ingest-tab">
+          <span class="nav-icon">📥</span>
+          <span>Ingest Any PDF</span>
+        </button>
+        <button class="nav-item" data-tab="settings-tab">
+          <span class="nav-icon">⚙️</span>
+          <span>AI Engine Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-status-card">
+        <div class="status-header">
+          <span class="pulse-dot" id="status-dot"></span>
+          <span class="status-title" id="status-engine-name">Reasoning Engine</span>
+        </div>
+        <div class="status-details">
+          <div class="status-row"><span>Indexed Claims:</span> <strong id="sidebar-indexed-facts">0</strong></div>
+          <div class="status-row"><span>Analyzed Documents:</span> <strong id="sidebar-total-docs">0</strong></div>
+          <div class="status-row"><span>Dual-Judge Arbiter:</span> <strong id="sidebar-arbiter-status" style="color:var(--accent-emerald);">Online</strong></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-title-section">
+          <h2 id="page-title">Curated Benchmark Exhibits</h2>
+          <p id="page-description">Gold-standard reference exhibits demonstrating cross-document adjudication behaviors with exact evidence quotes and dual-judge reasoning.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" id="btn-reset-showcase">🔄 Reset Knowledge Base</button>
+          <button class="btn btn-primary" id="btn-topbar-upload">⚡ Interrogate Any PDF</button>
+        </div>
+      </header>
+
+      <!-- Content Views -->
+      <div class="content-body">
+        <!-- 1. Showcase Exhibits Tab -->
+        <section id="showcase-tab" class="tab-view active">
+          <div class="showcase-grid" id="showcase-cards-container">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+        </section>
+
+        <!-- 2. Case Files / Facts Explorer Tab -->
+        <section id="dossier-tab" class="tab-view">
+          <div class="filter-bar">
+            <div class="search-input-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="fact-search-input" placeholder="Search facts by subject, predicate, metric value, or exact evidence..." />
+            </div>
+            <div class="filter-controls">
+              <select id="filter-doc">
+                <option value="">All Documents</option>
+              </select>
+              <select id="filter-status">
+                <option value="">All Statuses</option>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="SUPERSEDED">SUPERSEDED</option>
+              </select>
+              <select id="filter-method">
+                <option value="">All Extraction Methods</option>
+                <option value="frontier_llm">✨ Frontier LLM</option>
+                <option value="heuristic_fallback">⚙️ Heuristic Fallback</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="facts-table-container">
+            <table class="facts-table">
+              <thead>
+                <tr>
+                  <th>Subject & Predicate</th>
+                  <th>Object / Metric Value</th>
+                  <th>Dynamic Qualifiers</th>
+                  <th>Credibility</th>
+                  <th>Method</th>
+                  <th>Status</th>
+                  <th>Source Provenance</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="facts-table-body">
+                <!-- Populated dynamically by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 3. PDF Ingest Portal Tab -->
+        <section id="ingest-tab" class="tab-view">
+          <div class="ingest-portal-card">
+            <div id="ingest-engine-indicator" style="padding:0.6rem 1rem; border-radius:6px; font-size:0.82rem; margin-bottom:1.25rem; background:var(--bg-card); border:1px solid var(--border-color);">
+              ⚪ <strong>Engine Mode:</strong> Local Heuristic Pipeline (Rule-based extraction active. Connect an API Key in Settings for generative Frontier LLM reasoning).
+            </div>
+
+            <h3>Universal Document Intelligence & Corpus Ingestion</h3>
+            <p>The system generalizes across any unseen document domain (financial filings, scientific literature, legal briefs, institutional reports). The Detective extracts atomic claims with dynamic qualifiers, grounds exact character evidence spans, and executes real-time candidate adjudication.</p>
+            
+            <form id="upload-form" class="upload-dropzone">
+              <input type="file" id="pdf-file-input" accept=".pdf" multiple style="display:none;" />
+              <div class="dropzone-content" id="dropzone-area">
+                <div class="upload-icon">📄</div>
+                <h4>Drag & Drop Single or Multi-PDF Corpora (or Click to Browse)</h4>
+                <span class="file-name-display" id="selected-file-name">No files selected</span>
+                <div class="ingest-options">
+                  <label>Max Pages per Document: 
+                    <input type="number" id="upload-max-pages" value="20" min="1" max="100" />
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg" id="btn-upload-submit">⚡ Launch Detective & Courtroom</button>
+              </div>
+            </form>
+
+            <div class="ingest-progress-container" id="ingest-progress" style="display:none;">
+              <div class="spinner"></div>
+              <h4 id="progress-text">The Detective is interrogating the PDF...</h4>
+              <p>Extracting atomic claims & executing dual-judge Courtroom adjudication.</p>
+            </div>
+
+            <div class="ingest-results-card" id="ingest-results" style="display:none;">
+              <h4>Ingestion Dossier Summary</h4>
+              <div class="result-stats" id="result-stats-body"></div>
+              <div id="ingest-telemetry-box" style="margin-top:0.75rem;"></div>
+              <div id="ingest-logs-box" style="margin-top:1rem; display:none;">
+                <h4 style="font-size:0.85rem; margin-bottom:0.4rem; color:var(--text-secondary);">📜 Live Detective & Courtroom Execution Trace</h4>
+                <pre id="ingest-logs-content" style="background:#090d13; color:#7ee787; font-family:'JetBrains Mono',monospace; font-size:0.78rem; padding:0.85rem; border-radius:6px; max-height:240px; overflow-y:auto; white-space:pre-wrap; border:1px solid var(--border-color);"></pre>
+              </div>
+            </div>
+
+            <!-- Quick Benchmark Corpora Loader Section -->
+            <div class="benchmark-loader-box">
+              <div class="benchmark-header">
+                <div>
+                  <strong style="color:var(--text-primary); font-size:0.9rem;">⚡ Quick Benchmark Corpora Loader</strong>
+                  <p style="color:var(--text-secondary); font-size:0.8rem; margin-top:0.2rem;">Instantly ingest pre-extracted multi-document corpora to test large-scale cross-document adjudication.</p>
+                </div>
+              </div>
+              <div class="benchmark-actions">
+                <button class="btn btn-outline" id="btn-quick-ingest-sample-a">📂 Ingest Corporate Filings Corpus (3 Documents)</button>
+                <button class="btn btn-outline" id="btn-quick-ingest-sample-b">📂 Ingest Macroeconomic Reports Corpus (3 Documents)</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Settings Tab -->
+        <section id="settings-tab" class="tab-view">
+          <div class="settings-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <div>
+                <h3>Frontier AI Engine & Search Calibration</h3>
+                <p style="margin-bottom:0.5rem;">Configure your LLM API key to route extraction and Courtroom adjudication through frontier models.</p>
+              </div>
+            </div>
+
+            <div id="settings-model-badge" style="display:inline-block; padding:0.4rem 0.85rem; border-radius:6px; font-size:0.82rem; margin-bottom:1.25rem; background:var(--bg-card); border:1px solid var(--border-color);">
+              ⚪ <strong>Mode:</strong> Local Heuristic NLI Active
+            </div>
+            
+            <div class="form-group">
+              <label>API Key (Auto-detects Google Gemini, OpenAI GPT-4o, or Claude):</label>
+              <input type="password" id="setting-api-key" placeholder="Paste your API key here (e.g. AIzaSy... or sk-...)" />
+              <small>Provider is auto-detected instantly from your key format. Seamless zero-configuration handshake.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Vector Retrieval Cosine Similarity Threshold: <span id="thresh-val">0.65</span></label>
+              <input type="range" id="setting-threshold" min="0.30" max="0.95" step="0.05" value="0.65" />
+              <small>Calibrated to 0.65 for high-precision O(K) candidate pair matching.</small>
+            </div>
+
+            <div id="settings-status-banner" style="display:none; padding:0.85rem; border-radius:6px; margin-bottom:1.25rem; font-size:0.85rem;"></div>
+
+            <div style="display:flex; gap:0.75rem;">
+              <button class="btn btn-outline" id="btn-test-settings">⚡ Test Key Handshake</button>
+              <button class="btn btn-primary btn-lg" id="btn-save-settings">🚀 Apply Engine Configuration</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Detail Modal: Fact Dossier & Courtroom Adjudication Chamber -->
+  <div class="modal-overlay" id="dossier-modal" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-badge" id="modal-verdict-badge">VERDICT</span>
+          <h3 id="modal-fact-title">Fact Dossier</h3>
+        </div>
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Fact Overview Box -->
+        <div class="dossier-fact-summary">
+          <div class="fact-statement-box">
+            <span class="label-tag">Atomic Assertion</span>
+            <div class="fact-statement" id="modal-fact-statement"></div>
+          </div>
+          <div class="fact-metadata-grid">
+            <div>
+              <span class="label-tag">Credibility Calibration</span>
+              <div class="cred-meter-wrap">
+                <div class="cred-bar"><div class="cred-fill" id="modal-cred-fill"></div></div>
+                <strong id="modal-cred-score">0.95</strong>
+              </div>
+            </div>
+            <div>
+              <span class="label-tag">Extraction Provenance</span>
+              <span class="status-badge" id="modal-fact-method" style="background:rgba(56, 139, 253, 0.15); color:var(--accent-cyan); border:1px solid rgba(56, 139, 253, 0.4);">✨ Frontier LLM</span>
+            </div>
+            <div>
+              <span class="label-tag">Lifecycle Status</span>
+              <span class="status-badge" id="modal-fact-status">ACTIVE</span>
+            </div>
+          </div>
+          <div id="modal-supersession-box" style="display:none; margin-top:0.75rem; padding:0.75rem; border-radius:6px; background:rgba(187, 128, 9, 0.12); border:1px solid rgba(187, 128, 9, 0.4); font-size:0.82rem;"></div>
+        </div>
+
+        <!-- Qualifiers Breakdown -->
+        <div class="dossier-section">
+          <h4 class="section-title">Dynamic Qualifiers</h4>
+          <div class="qualifiers-tags" id="modal-qualifiers-list"></div>
+        </div>
+
+        <!-- Source Evidence Dossier -->
+        <div class="dossier-section">
+          <h4 class="section-title">Source Evidence & Provenance</h4>
+          <div class="evidence-quote-box">
+            <div class="evidence-doc-meta">
+              <span>📄 <strong id="modal-evidence-doc">Document</strong></span>
+              <span class="page-tag" id="modal-evidence-page">Page 1</span>
+            </div>
+            <blockquote class="evidence-quote" id="modal-evidence-quote"></blockquote>
+          </div>
+        </div>
+
+        <!-- Courtroom Adjudication Chamber (Witnesses & Dual-Judge) -->
+        <div class="dossier-section">
+          <h4 class="section-title">Courtroom Adjudication Chamber</h4>
+          <div id="modal-verdicts-container">
+            <!-- Side by side Skeptic vs Reconciler opinions -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

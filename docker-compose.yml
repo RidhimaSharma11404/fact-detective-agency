@@ -1,0 +1,15 @@
+﻿version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SIMILARITY_THRESHOLD=0.65
+      - GEMINI_API_KEY=
+      - OPENAI_API_KEY=
+      - ANTHROPIC_API_KEY=
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
