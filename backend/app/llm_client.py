@@ -112,18 +112,44 @@ class LLMClient:
             return {"ok": False, "error": "No API Key provided. Please enter an API key to test the handshake."}
 
         if prov == "gemini" or key.startswith("AIzaSy"):
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
-            payload = {"contents": [{"role": "user", "parts": [{"text": "Ping"}]}]}
+            # 1. Query models endpoint to discover supported models for this specific API key
+            discovered_model = None
             try:
                 with httpx.Client(timeout=10.0) as client:
-                    resp = client.post(url, json=payload)
-                    if resp.status_code == 200:
-                        return {"ok": True, "message": "Google Gemini 1.5 Flash API key verified successfully! Frontier inference active."}
-                    else:
-                        err_msg = resp.json().get("error", {}).get("message", resp.text)
-                        return {"ok": False, "error": f"Gemini API Error ({resp.status_code}): {err_msg}"}
-            except Exception as e:
-                return {"ok": False, "error": f"Connection error: {str(e)}"}
+                    list_url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
+                    list_resp = client.get(list_url)
+                    if list_resp.status_code == 200:
+                        models_data = list_resp.json().get("models", [])
+                        valid_models = [
+                            m["name"].replace("models/", "")
+                            for m in models_data
+                            if "generateContent" in m.get("supportedGenerationMethods", [])
+                        ]
+                        if valid_models:
+                            discovered_model = next((m for m in ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-pro"] if m in valid_models), valid_models[0])
+                            self.gemini_model = discovered_model
+                            return {"ok": True, "message": f"Google Gemini API key verified successfully! Active model: {discovered_model}"}
+                    elif list_resp.status_code in [400, 403]:
+                        err_msg = list_resp.json().get("error", {}).get("message", list_resp.text)
+                        return {"ok": False, "error": f"Gemini API Error ({list_resp.status_code}): {err_msg}"}
+            except Exception:
+                pass
+
+            # 2. Try candidate models directly
+            candidate_models = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-pro"]
+            for model_name in candidate_models:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={key}"
+                payload = {"contents": [{"role": "user", "parts": [{"text": "Ping"}]}]}
+                try:
+                    with httpx.Client(timeout=8.0) as client:
+                        resp = client.post(url, json=payload)
+                        if resp.status_code == 200:
+                            self.gemini_model = model_name
+                            return {"ok": True, "message": f"Google Gemini ({model_name}) verified successfully! Frontier inference active."}
+                except Exception:
+                    continue
+
+            return {"ok": False, "error": "Could not authenticate Gemini API key or find a supported Gemini model for this key."}
 
         elif prov == "openai" or key.startswith("sk-"):
             url = "https://api.openai.com/v1/chat/completions"
@@ -188,7 +214,9 @@ class LLMClient:
             return self._call_offline_deliberator(system_prompt, user_prompt)
 
     def _call_gemini(self, system_prompt: str, user_prompt: str, key: str, temperature: float, max_retries: int = 3) -> str:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+        preferred_model = getattr(self, "gemini_model", None) or "gemini-1.5-flash"
+        models_to_try = [preferred_model] + [m for m in ["gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"] if m != preferred_model]
+
         payload = {
             "contents": [
                 {
@@ -201,17 +229,23 @@ class LLMClient:
                 "responseMimeType": "application/json"
             }
         }
-        for attempt in range(max_retries):
-            try:
-                with httpx.Client(timeout=25.0) as client:
-                    resp = client.post(url, json=payload)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        return data["candidates"][0]["content"]["parts"][0]["text"]
-            except Exception:
-                if attempt < max_retries - 1:
-                    time.sleep(0.5 * (2 ** attempt))
-                continue
+
+        for model_name in models_to_try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={key}"
+            for attempt in range(max_retries):
+                try:
+                    with httpx.Client(timeout=25.0) as client:
+                        resp = client.post(url, json=payload)
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            self.gemini_model = model_name
+                            return data["candidates"][0]["content"]["parts"][0]["text"]
+                        elif resp.status_code == 404:
+                            break  # Model not found on this endpoint, try next candidate model
+                except Exception:
+                    if attempt < max_retries - 1:
+                        time.sleep(0.5 * (2 ** attempt))
+                    continue
         return self._call_offline_deliberator(system_prompt, user_prompt)
 
     def _call_openai(self, system_prompt: str, user_prompt: str, key: str, temperature: float, max_retries: int = 3) -> str:
