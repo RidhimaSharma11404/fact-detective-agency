@@ -11,7 +11,59 @@
 
 ---
 
-## 🏛️ Core Architecture: Multi-Agent System Design
+## 🌐 Live Application & Deployment Links
+
+| Deployment | URL & Access Details | Status |
+|---|---|---|
+| 🚀 **Live Cloud Demo** | **[https://fact-detective-agency.loca.lt](https://fact-detective-agency.loca.lt)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
+| ⚡ **Vercel Deployment** | **[https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app](https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app)** | 🟢 **Active** |
+| 🐙 **GitHub Repository** | **[https://github.com/RidhimaSharma11404/fact-detective-agency](https://github.com/RidhimaSharma11404/fact-detective-agency)** | 🟢 **Main** |
+| 🐳 **Docker Hub / Local** | `docker run -p 8000:8000 fact-detective-agency` | 🟢 **Ready** |
+
+---
+
+## 🧠 What The AI Models & Agents Are Actually Doing (Step-by-Step Breakdown)
+
+The system transforms raw, unstructured PDF text into an audited, structured knowledge graph and cross-examines claims across multiple documents through 4 coordinated stages:
+
+```
+[ PDF Document ] ──> 1. Detective Agent ──> 2. Dense Vector Index ──> 3. Courtroom Dual-Judge ──> 4. Chief Magistrate Arbiter
+                        (Extraction &           (O(K) Candidate          (Adversarial Skeptic vs      (Final Verdict & Lifecycle
+                         Credibility)             Search)                  Context Reconciler)          Audit Trail)
+```
+
+### 🔍 1. The Detective Agent (Claim Extraction & Epistemic Calibration)
+- **What it does**: Reads incoming PDF pages using layout-aware block parsing. It extracts atomic factual propositions in a structured format:
+  $$\text{Claim} = \langle \text{Subject}, \text{Predicate}, \text{Object}, \text{Qualifiers}, \text{Credibility}, \text{Evidence} \rangle$$
+- **Dynamic Context Qualifiers**: Instead of a hardcoded schema, it dynamically infers context attributes from surrounding text (e.g., `fiscal_year: FY24`, `reporting_basis: consolidated`, `unit: INR Millions`, `conditionality: freight tailwinds`).
+- **Epistemic Modality & Credibility Calibration ($0.0 \to 1.0$)**: Calibrates factual reliability using linguistic certainty markers:
+  - `0.90 – 1.00`: Audited statutory balance sheets, official government tables, definitive historical facts.
+  - `0.70 – 0.89`: Clear narrative management commentary and operational disclosures.
+  - `0.50 – 0.69`: Hedged or estimated language (*"estimated at"*, *"approximately"*, *"around"*).
+  - `0.20 – 0.49`: Forward-looking guidance, forecasts, targets (*"management expects"*, *"projected within 4–6 quarters"*).
+- **Verbatim Evidence Anchoring**: Locates exact character offsets and page citations (`doc_name`, `page_number`, `exact_text_span`) with fuzzy sliding-window normalization (`SequenceMatcher`).
+
+### ⚡ 2. Candidate Retrieval ($O(K)$ Dense Vector Index)
+- **The Problem**: Comparing every newly extracted fact against all existing facts grows quadratically ($O(N^2)$), creating massive latency bottlenecks.
+- **What it does**: Generates dense 256-dimensional semantic embeddings for each atomic claim. When a new fact is ingested, the system queries the Vector Index to retrieve only top-$K$ candidate fact pairs above a cosine similarity threshold ($\ge 0.65$), restricting LLM dual-judge debate strictly to semantically related claims.
+
+### ⚖️ 3. The Courtroom Dual-Judge Panel (Adversarial NLI Debate)
+- To prevent single-prompt confirmation bias, two distinct agent personas cross-examine each candidate fact pair:
+  - **🗡️ The Skeptic Judge**: Acts as an adversarial prosecutor. It hunts aggressively for numerical divergences, contradictory metrics, time-interval conflicts, and incompatible corporate claims.
+  - **⚖️ The Reconciler Judge**: Acts as an investigative contextual judge. It checks whether apparent contradictions are logically explained by:
+    1. *Temporal Scope* (e.g., FY21 pre-IPO revenue vs. FY24 post-acquisition revenue).
+    2. *Predicate / Line-Item Scope* (e.g., *"revenue from contracts"* vs. *"total consolidated operational revenue"*).
+    3. *Reporting Standards / Currency Units* (e.g., nominal USD vs. INR Crores).
+    4. *Corporate Lifecycle Transitions* (e.g., executive director status updating over time).
+
+### 🏁 4. Chief Magistrate Arbiter & Fact Lifecycle Management
+- **Authoritative Verdicts**: The system synthesizes the judges' arguments into 5 standard verdict classes:
+  - `CORROBORATED`: Both independent documents confirm the same underlying fact.
+  - `CONTRADICTED`: Direct irreconcilable contradiction between sources under the same conditions.
+  - `RECONCILED`: Apparent tension fully resolved by temporal, scope, or accounting differences.
+  - `SUPERSEDED_BY`: A newer document chronologically updates an older claim (older claim is retired with persistent audit links).
+  - `HUNG_JURY`: Deadlock on epistemic modality (e.g., forward guidance vs. audited loss).
+- **⚡ Chief Magistrate Tiebreaker**: For `HUNG_JURY` deadlocks, an impartial senior judge reviews both arguments and executes an authoritative resolution or flags for human-in-the-loop review.
 
 Rather than a brittle, monolithic pipeline, the agency separates intelligence into specialized, collaborating agent roles with strict provenance tracking:
 
