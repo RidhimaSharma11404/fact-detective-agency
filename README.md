@@ -9,13 +9,16 @@
 
 **The Fact Detective Agency** is a production-grade multi-agent fact knowledge layer that extracts atomic claims from complex PDF documents, anchors each claim to verifiable verbatim source evidence, indexes them for $O(K)$ candidate retrieval, and adjudicates whether claims across documents **corroborate**, **contradict**, or can be **reconciled** through temporal, scope, unit, or corporate lifecycle context using dual-judge adversarial NLI reasoning (**The Skeptic** vs. **The Reconciler**, with **The Chief Magistrate** tiebreaker).
 
+> 🌐 **Live Deployed Application**: **[The Fact Detective Agency — Fact Knowledge & Adjudication Layer](https://fact-detective-agency.loca.lt/)**  
+> *(When opening the link, enter Endpoint IP / Password **`182.72.39.9`** and click Submit to access the live app)*
+
 ---
 
 ## 🌐 Live Application & Deployment Links
 
-| Deployment | URL & Access Details | Status |
+| Deployment | Direct Link & Access Details | Status |
 |---|---|---|
-| 🚀 **Live Cloud Demo** | **[https://fact-detective-agency.loca.lt](https://fact-detective-agency.loca.lt)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
+| 🚀 **Live Cloud App** | **[The Fact Detective Agency — Fact Knowledge & Adjudication Layer](https://fact-detective-agency.loca.lt/)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
 | 🌐 **Live Cloud Mirror** | **[https://short-hats-cheat.loca.lt](https://short-hats-cheat.loca.lt)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
 | ⚡ **Vercel Production** | **[https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app](https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app)** | 🟢 **Active** |
 | 🐙 **GitHub Repository** | **[https://github.com/RidhimaSharma11404/fact-detective-agency](https://github.com/RidhimaSharma11404/fact-detective-agency)** | 🟢 **Main** |
