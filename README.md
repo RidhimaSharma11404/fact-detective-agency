@@ -16,7 +16,8 @@
 | Deployment | URL & Access Details | Status |
 |---|---|---|
 | 🚀 **Live Cloud Demo** | **[https://fact-detective-agency.loca.lt](https://fact-detective-agency.loca.lt)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
-| ⚡ **Vercel Deployment** | **[https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app](https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app)** | 🟢 **Active** |
+| 🌐 **Live Cloud Mirror** | **[https://short-hats-cheat.loca.lt](https://short-hats-cheat.loca.lt)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
+| ⚡ **Vercel Production** | **[https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app](https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app)** | 🟢 **Active** |
 | 🐙 **GitHub Repository** | **[https://github.com/RidhimaSharma11404/fact-detective-agency](https://github.com/RidhimaSharma11404/fact-detective-agency)** | 🟢 **Main** |
 | 🐳 **Docker Hub / Local** | `docker run -p 8000:8000 fact-detective-agency` | 🟢 **Ready** |
 
