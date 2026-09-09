@@ -1,4 +1,16 @@
-import pymupdf as fitz
+try:
+    import pymupdf as fitz
+except ImportError:
+    try:
+        import fitz
+    except ImportError:
+        fitz = None
+
+try:
+    import pypdf
+except ImportError:
+    pypdf = None
+
 import re
 import difflib
 from typing import List, Dict, Any, Optional, Tuple
@@ -22,8 +34,16 @@ class PDFParser:
         self.filepath = Path(filepath)
         if not self.filepath.exists():
             raise FileNotFoundError(f"PDF file not found: {self.filepath}")
-        self.doc = fitz.open(str(self.filepath))
-        self.total_pages = len(self.doc)
+        
+        self.use_fitz = fitz is not None
+        if self.use_fitz:
+            self.doc = fitz.open(str(self.filepath))
+            self.total_pages = len(self.doc)
+        elif pypdf:
+            self.reader = pypdf.PdfReader(str(self.filepath))
+            self.total_pages = len(self.reader.pages)
+        else:
+            self.total_pages = 0
 
     def get_page_count(self) -> int:
         return self.total_pages
@@ -35,21 +55,24 @@ class PDFParser:
         if page_num < 1 or page_num > self.total_pages:
             raise ValueError(f"Page number {page_num} out of bounds (1-{self.total_pages})")
         
-        page = self.doc[page_num - 1]
-        raw_text = page.get_text("text")
-        
-        # Extract blocks for layout awareness (tables / paragraphs)
         blocks = []
-        for b in page.get_text("blocks"):
-            # b: (x0, y0, x1, y1, text, block_no, block_type)
-            if b[6] == 0:  # text block
-                cleaned_block = normalize_text(b[4])
-                if cleaned_block:
-                    blocks.append({
-                        "bbox": [round(b[0], 2), round(b[1], 2), round(b[2], 2), round(b[3], 2)],
-                        "text": cleaned_block,
-                        "block_no": b[5]
-                    })
+        if self.use_fitz:
+            page = self.doc[page_num - 1]
+            raw_text = page.get_text("text")
+            for b in page.get_text("blocks"):
+                if b[6] == 0:  # text block
+                    cleaned_block = normalize_text(b[4])
+                    if cleaned_block:
+                        blocks.append({
+                            "bbox": [round(b[0], 2), round(b[1], 2), round(b[2], 2), round(b[3], 2)],
+                            "text": cleaned_block,
+                            "block_no": b[5]
+                        })
+        elif pypdf:
+            page = self.reader.pages[page_num - 1]
+            raw_text = page.extract_text() or ""
+        else:
+            raw_text = ""
 
         return {
             "page_number": page_num,
@@ -159,4 +182,5 @@ class PDFParser:
         return best_match
 
     def close(self):
-        self.doc.close()
+        if self.use_fitz and hasattr(self, 'doc') and self.doc:
+            self.doc.close()
