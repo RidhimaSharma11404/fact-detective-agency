@@ -19,6 +19,7 @@
 | Deployment | Direct Link & Access Details | Status |
 |---|---|---|
 | 🚀 **Live Cloud App** | **[The Fact Detective Agency — Fact Knowledge & Adjudication Layer](https://fact-detective-agency.loca.lt/)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
+| 📊 **Executive Presentation (PPT)** | **[Download Fact_Detective_Agency_Presentation.pptx](./Fact_Detective_Agency_Presentation.pptx)** | 🟢 **Available** |
 | 🌐 **Live Cloud Mirror** | **[https://short-hats-cheat.loca.lt](https://short-hats-cheat.loca.lt)**<br>*(Endpoint Password: `182.72.39.9`)* | 🟢 **Online** |
 | ⚡ **Vercel Production** | **[https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app](https://fact-detective-agency-git-main-ai-based-resume-checker.vercel.app)** | 🟢 **Active** |
 | 🐙 **GitHub Repository** | **[https://github.com/RidhimaSharma11404/fact-detective-agency](https://github.com/RidhimaSharma11404/fact-detective-agency)** | 🟢 **Main** |
